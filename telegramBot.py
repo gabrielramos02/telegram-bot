@@ -1,4 +1,5 @@
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler, CallbackContext
 from os import environ
 from commands.start import start_command
 from commands.help import help_command
@@ -7,6 +8,9 @@ from responses.button_tap import button_tap
 
 TOKEN = environ["TOKEN"]
 BOT_USERNAME = environ["BOT_USERNAME"]
+
+async def cancel(update: Update, context: CallbackContext):
+    print("hola")
 
 
 #App Initial
@@ -18,9 +22,11 @@ if __name__ in "__main__":
 
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
 
-    app.add_handler(CallbackQueryHandler(button_tap))
-
+    app.add_handler(CallbackQueryHandler(pattern="Cancel",callback=cancel))
+    app.add_handler(CallbackQueryHandler(pattern="Info",callback=button_tap))
+        
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
     print("Polling")
-    app.run_polling(poll_interval=3)
+    
 
     

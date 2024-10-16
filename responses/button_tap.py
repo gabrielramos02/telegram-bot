@@ -1,12 +1,15 @@
-from enum import Flag
-import re
+from curses.ascii import CAN
+import threading
 from time import sleep
-from telegram import Message, Update
+from telegram import Message, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 
 from .barra_progreso import barra_progreso
 from .api_request import request_info, request_torrent_info
 
+CANCEL_MARKUP = InlineKeyboardMarkup(
+    [[InlineKeyboardButton("Cancel", callback_data="Cancel",)]]
+)
 
 async def button_tap(update: Update, context: CallbackContext):
 
@@ -15,8 +18,17 @@ async def button_tap(update: Update, context: CallbackContext):
     data = update.callback_query.data
     text = update.callback_query.message.reply_to_message.text
     markup = None
-    if data == "Info":
-        await progress_menu(text, update, context)
+    print(data)
+    async def thread1(update: Update, context: CallbackContext):
+        await update.callback_query.answer(text="")
+        if data == "Cancel" and text != "Cancelado":
+            await update.callback_query.edit_message_text("Cancelado")
+        if data == "Info":
+            await progress_menu(text, update, context)
+    t1 = threading.Thread(target=thread1,args=(update,context))
+    t1.start()
+    
+
 
 
 async def progress_menu(text: str, update: Update, context: CallbackContext):
@@ -30,18 +42,27 @@ async def progress_menu(text: str, update: Update, context: CallbackContext):
 
     for t in torrent_list:
         if t.get("magnet_uri") == text:
-            # print(t)
+
             torrent = t
-            # print(torrent)
+
             break
 
     while True:
         info = request_torrent_info(torrent.get("hash"))
+        if info == "404":
+            message = await update.callback_query.edit_message_text(
+                "Torrent no encontrado"
+            )
+            break
         while info == []:
             if message.text != "Descargando Metadata":
-                message = await update.callback_query.edit_message_text("Descargando Metadata")
-                sleep(3)
+                message = await update.callback_query.edit_message_text(
+                    "Descargando Metadata",
+                    reply_markup=CANCEL_MARKUP,
+                )
+                sleep(8)
             info = request_torrent_info(torrent.get("hash"))
+            sleep(8)
 
         progress = 0
         is_seed = True
@@ -61,16 +82,17 @@ async def progress_menu(text: str, update: Update, context: CallbackContext):
             # Torrent Completado
             message = await update.callback_query.edit_message_text(
                 "Completado",
+                reply_markup=CANCEL_MARKUP,
             )
             break
         # print(update.message.id)
         percent = progress * 100
 
         # print(f'Downloaded: {info.get("total_downloaded")}, Total: {info.get("total_size")} ')
-        #print(percent)
+        # print(percent)
         text = barra_progreso(percent)
-        
-        print(message.text)
+
+        #print(message.text)
 
         message_text = f"Progreso\n\n{text}   {percent}%"
 
@@ -78,6 +100,7 @@ async def progress_menu(text: str, update: Update, context: CallbackContext):
             message = await update.callback_query.edit_message_text(
                 message_text,
                 parse_mode="html",
+                reply_markup=CANCEL_MARKUP
             )
         sleep(8)
         # await update.message.edit_text("En Proceso")
