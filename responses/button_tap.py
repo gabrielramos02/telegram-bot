@@ -1,4 +1,3 @@
-from curses.ascii import CAN
 from asyncio import sleep
 from telegram import Message, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
@@ -73,11 +72,11 @@ async def progress_menu(text: str, update: Update, context: CallbackContext):
         total = 0
         is_seed = True
         # print(info)
-
+        #print(info)
         for file in info:
+            #print(file.get("is_seed"))
             if file.get("is_seed"):
-                # print(file.get("is_seed"))
-                pass
+                break
             else:
                 is_seed = False
             descargado = descargado + file.get("progress") * file.get("size")
