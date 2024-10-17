@@ -66,10 +66,11 @@ async def progress_menu(text: str, update: Update, context: CallbackContext):
                     "Descargando Metadata",
                     reply_markup=CANCEL_MARKUP,
                 )
-                await sleep(8)
+                await sleep(3)
             info = await request_torrent_info(torrent.get("hash"))
 
-        progress = 0
+        descargado = 0
+        total = 0
         is_seed = True
         # print(info)
 
@@ -79,7 +80,8 @@ async def progress_menu(text: str, update: Update, context: CallbackContext):
                 pass
             else:
                 is_seed = False
-            progress = progress + file.get("progress")
+            descargado = descargado + file.get("progress") * file.get("size")
+            total = total + file.get("size")
 
         # print(is_seed)
         # print(info.get("completion_date"))
@@ -90,8 +92,9 @@ async def progress_menu(text: str, update: Update, context: CallbackContext):
                 reply_markup=CANCEL_MARKUP,
             )
             break
+        
         # print(update.message.id)
-        percent = progress * 100
+        percent = descargado * 100 / total
 
         # print(f'Downloaded: {info.get("total_downloaded")}, Total: {info.get("total_size")} ')
         # print(percent)
