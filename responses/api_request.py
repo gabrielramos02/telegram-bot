@@ -1,4 +1,3 @@
-from cgitb import text
 from urllib import response
 import os
 import aiohttp
