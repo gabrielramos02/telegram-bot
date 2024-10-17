@@ -1,5 +1,4 @@
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler, CallbackContext, ApplicationBuilder
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from os import environ
 from commands.start import start_command
 from commands.help import help_command
