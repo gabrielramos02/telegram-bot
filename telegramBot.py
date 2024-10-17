@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler, CallbackContext, ApplicationBuilder
 from os import environ
 from commands.start import start_command
 from commands.help import help_command
@@ -16,17 +16,18 @@ async def cancel(update: Update, context: CallbackContext):
 #App Initial
 if __name__ in "__main__":
     print("Starting Bot")
-    app = Application.builder().token(TOKEN).build()
+    app = Application.builder().token(TOKEN).concurrent_updates(True).build()
 
-    app.add_handler(CommandHandler("start",start_command))
+    app.add_handler(CommandHandler("start",start_command,block=False))
 
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
 
     app.add_handler(CallbackQueryHandler(pattern="Cancel",callback=cancel))
     app.add_handler(CallbackQueryHandler(pattern="Info",callback=button_tap))
         
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
     print("Polling")
+    app.run_polling()
+    
     
 
     

@@ -1,5 +1,4 @@
 from curses.ascii import CAN
-import threading
 from time import sleep
 from telegram import Message, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
@@ -19,14 +18,11 @@ async def button_tap(update: Update, context: CallbackContext):
     text = update.callback_query.message.reply_to_message.text
     markup = None
     print(data)
-    async def thread1(update: Update, context: CallbackContext):
-        await update.callback_query.answer(text="")
-        if data == "Cancel" and text != "Cancelado":
-            await update.callback_query.edit_message_text("Cancelado")
-        if data == "Info":
-            await progress_menu(text, update, context)
-    t1 = threading.Thread(target=thread1,args=(update,context))
-    t1.start()
+    await update.callback_query.answer(text="")
+    if data == "Cancel" and text != "Cancelado":
+        await update.callback_query.edit_message_text("Cancelado")
+    if data == "Info":
+        await progress_menu(text, update, context)
     
 
 
