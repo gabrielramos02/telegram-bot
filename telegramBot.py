@@ -9,9 +9,6 @@ from responses.button_tap import button_tap
 TOKEN = environ["TOKEN"]
 BOT_USERNAME = environ["BOT_USERNAME"]
 
-async def cancel(update: Update, context: CallbackContext):
-    print("hola")
-
 
 #App Initial
 if __name__ in "__main__":
@@ -22,8 +19,7 @@ if __name__ in "__main__":
 
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
 
-    app.add_handler(CallbackQueryHandler(pattern="Cancel",callback=cancel))
-    app.add_handler(CallbackQueryHandler(pattern="Info",callback=button_tap))
+    app.add_handler(CallbackQueryHandler(button_tap))
         
     print("Polling")
     app.run_polling()

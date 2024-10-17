@@ -29,7 +29,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     else:
         if magnet_match:
-            if send_magnet(text):
+            if await send_magnet(text):
                 response = "Agregado Correctamente"
 
                 await context.bot.send_message(
